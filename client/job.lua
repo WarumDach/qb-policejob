@@ -815,49 +815,56 @@ RegisterNetEvent('police:client:ChangeExtra', function(data)
 end)
 
 RegisterNetEvent('police:client:TowMenu', function(Vehicle, Plate)
-    local Model = GetDisplayNameFromVehicleModel(GetEntityModel(Vehicle))
-    local ModelBrand = QBCore.Shared.Vehicles[string.lower(Model)].brand
-    local ModelName = QBCore.Shared.Vehicles[string.lower(Model)].name
+    local success, errorMsg = pcall(function()
+        local Model = GetDisplayNameFromVehicleModel(GetEntityModel(Vehicle))
+        local ModelBrand = QBCore.Shared.Vehicles[string.lower(Model)].brand
+        local ModelName = QBCore.Shared.Vehicles[string.lower(Model)].name
 
-    exports['qb-menu']:openMenu({
-        {
-            header = Lang:t('info.tow_vehicle'),
-            txt = Lang:t('menu.tow_menu_header_b', {vehicle= ModelBrand..' '..ModelName, plate= Plate}),
-            isMenuHeader = true,
-        },
-        {
-            header = Lang:t('menu.tow_menu_depot_h'),
-            txt = Lang:t('menu.tow_menu_depot_b'),
-            icon = 'fa-solid fa-truck-pickup',
-            params = {
-                event = 'police:client:Tow',
-                args = {
-                    type = 'depot',
-                    plate = Plate,
-                    model = ModelName,
-		            vehicle = Vehicle
+        exports['qb-menu']:openMenu({
+            {
+                header = Lang:t('info.tow_vehicle'),
+                txt = Lang:t('menu.tow_menu_header_b', {vehicle= ModelBrand..' '..ModelName, plate= Plate}),
+                isMenuHeader = true,
+            },
+            {
+                header = Lang:t('menu.tow_menu_depot_h'),
+                txt = Lang:t('menu.tow_menu_depot_b'),
+                icon = 'fa-solid fa-truck-pickup',
+                params = {
+                    event = 'police:client:Tow',
+                    args = {
+                        type = 'depot',
+                        plate = Plate,
+                        model = ModelName,
+                        vehicle = Vehicle
+                    }
                 }
-            }
-        },
-        {
-            header = Lang:t('menu.tow_menu_impound_h'),
-            txt = Lang:t('menu.tow_menu_impound_b'),
-            icon = 'fa-solid fa-shield',
-            params = {
-                event = 'police:client:Tow',
-                args = {
-                    type = 'impound',
-                    plate = Plate,
-                    model = ModelName,
-		            vehicle = Vehicle
+            },
+            {
+                header = Lang:t('menu.tow_menu_impound_h'),
+                txt = Lang:t('menu.tow_menu_impound_b'),
+                icon = 'fa-solid fa-shield',
+                params = {
+                    event = 'police:client:Tow',
+                    args = {
+                        type = 'impound',
+                        plate = Plate,
+                        model = ModelName,
+                        vehicle = Vehicle
+                    }
                 }
+            },
+            {
+                header = Lang:t('menu.close_x'),
+                icon = 'fa-solid fa-xmark'
             }
-        },
-        {
-            header = Lang:t('menu.close_x'),
-            icon = 'fa-solid fa-xmark'
-        }
-    })
+        })
+    end)
+
+    if not success then
+        QBCore.Functions.Notify('This vehicle is not in the database', 'error')
+
+    end
 end)
 
 RegisterNetEvent('police:client:Tow', function(Data)
